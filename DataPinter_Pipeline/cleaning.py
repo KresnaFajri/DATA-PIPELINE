@@ -1,6 +1,7 @@
 import pandas as pd
 import sys
 import re
+from rapidfuzz import fuzz
 import ahocorasick
 
 def CleaningPunct(df,columns):
@@ -54,22 +55,36 @@ def build_brand_automaton(brand_list):
 
     return A
 
-def extract_brand(text, automaton):
+def extract_brand(text, automaton,brand_list,fuzzy_threshold=80):
     matches = []
-    
-    for end_idx, original_brand in automaton.iter(text.lower()):
+    text_lower = text.lower()
+
+        # --- 1. Exact match via Aho-Corasick ---
+    for end_idx, original_brand in automaton.iter(text_lower):
         start_idx = end_idx - len(original_brand) + 1
-        
-        # Validasi word boundary kiri
-        left_ok = (start_idx == 0) or (not text[start_idx - 1].isalnum())
-        # Validasi word boundary kanan
-        right_ok = (end_idx == len(text) - 1) or (not text[end_idx + 1].isalnum())
-        
+
+        left_ok = (start_idx == 0) or (not text_lower[start_idx - 1].isalnum())
+        right_ok = (end_idx == len(text_lower) - 1) or (not text_lower[end_idx + 1].isalnum())
+
         if left_ok and right_ok:
-            matches.append(original_brand)
+            matches.append((original_brand, 100))
     
     if not matches:
+        words = text_lower.split()
+        for brand in brand_list:
+            brand_lower = brand.lower().strip()
+
+            for word in words:
+                score=fuzz.ratio(word, brand_lower)
+                if score >= fuzzy_threshold:
+                    matches.append((brand,score))
+                    break
+            if len(brand_lower.split())>1:
+                score = fuzz.partial_ratio(text_lower, brand_lower)
+                if score >= fuzzy_threshold:
+                    matches.append((brand,score))
+    if not matches:
         return "Tidak Ada Merek"
-    
-    # Ambil match yang paling panjang = paling spesifik
-    return max(matches, key=len)
+
+    best_match = max(matches, key=lambda x:(x[1],len(x[0])))
+    return best_match[0]

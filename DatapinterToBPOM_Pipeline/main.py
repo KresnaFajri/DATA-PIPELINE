@@ -97,5 +97,5 @@ if __name__ == "__main__":
     ConnectAndSearch()
     ReadAndCreateSpiderCharts(Config.CLEAN_BPOMDB_PATH, 
                               TARGET_PATH=Config.BRAND_PRODUCT_VAR_PATH,
-                              brand_list = ['ERHAIR','SOFT CARE'],
+                              brand_list = ['VASELINE','MAYBELLINE','TIMEPHORIA','BIOAQUA','NIVEA','GOUTE','GLAD2GLOW','EMINA','MADAME GIE','DEAR ME BEAUTY','GLOWSOPHY','BUTTERED','MAYBELLINE'],
                               filter_category = None)

@@ -113,7 +113,3 @@ if age_df:
         db_path = os.path.join(Config.TARGET_PATH,'age.duckdb'),
         table_name = 'AgeReport',
         mode = 'replace')
-
-#Check Whether file already stored in DuckDB
-con = duckdb.connect(r"C:\KRESNA\ANALYSIS\Ads Analysis\DUCKDB_ADS_DATASET\location.duckdb")
-print(con.execute("SHOW TABLES").fetchdf())
