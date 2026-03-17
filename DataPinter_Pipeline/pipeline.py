@@ -36,13 +36,13 @@ scaler = MinMaxScaler()
 SKINCARE_CATEGORIES = {'toner','serum','cleanser','face wash','sunscreen','moisturizer','men care','parfum','perfume'}
 BODYCARE_CATEGORIES = {'body wash','body lotion','body mask'}
 HAIRCARE_CATEGORIES = {'hair','rambut','conditioner','shampoo','hair mask','hair serum'}
-LIPCARE_CATEGORIES = {'lip serum','lip cream'}
-DECORATIVE_CATEGORIES= {'lip tint','lip matte','lip vinyl','lip stick','lip balm','cushion','foundation'}
+LIPCARE_CATEGORIES = {'lip serum','lip cream',"lip balm"}
+DECORATIVE_CATEGORIES= {'lip tint','lip matte','lip vinyl','lip stick','cushion','foundation'}
 SUPLEMEN_CATEGORIES = {'suplemen', 'kapsul','vitamin','creatine','fitness','gym','whey protein'}
 
 #Fill the address of the data 1path
 DATA_PATH =PipelineConfig.DATA_PATH
-DATA_PATH_STR ="C:\\KRESNA\\ANALYSIS\\SKINCARE\\Dec 2025 - Jan 2026\\DATASET SKINCARE RAW"
+DATA_PATH_STR =str(PipelineConfig.DATA_PATH)
 STOPWORDS_PATH =PipelineConfig.STOPWORDS_PATH 
 
 BRAND_PATH_CSV=PipelineConfig.BRAND_PATH
@@ -73,16 +73,15 @@ for file in os.listdir(DATA_PATH):
     if ReadLog(DB_LOG=PipelineConfig.PIPELINE_DB_LOG, file_name=file):
         print(f"SKIPPING {file}")
         continue
-
     else:
-
-        #Extract files and read it
+    #Extract files and read it
         df = extract_files(full_path)
 
         #Perform data cleaning
         df = df.drop(columns = ['Gambar','Jumlah Stok','Nilai Stok'],errors = 'ignore')
         df['Nama Produk'] = df['Nama Produk'].fillna('')
         df['Nama Produk'] = df['Nama Produk'].astype(str).str.strip().apply(lambda x: NLPCleaner.CleanStopwords(x, STOPWORDS_LIST))
+
         #Parse Metadata from file name
         query_datasource, query_keywords,query_date = cleaner.ParseMetadata(filename = str(file))
         print(f'{file}, columns = {df.columns}')
@@ -100,19 +99,18 @@ for file in os.listdir(DATA_PATH):
         df['Nama Produk'] = df['Nama Produk'].apply(lambda text:text.title())
         
         df['Nama Produk'] = df['Nama Produk'].apply(lambda text: text.lower())
-        print(df['Nama Produk'].head(1))
-        print(brand_list[:5])
 
         automaton = build_brand_automaton(brand_list)
 
         # extract brand
         if 'Brand' not in df.keys():
-            df["Brand"] = df["Nama Produk"].apply(lambda x: extract_brand(text = x,automaton=automaton))
+            df["Brand"] = df["Nama Produk"].apply(lambda x: extract_brand(text = x,automaton=automaton,brand_list=brand_list))
             df['Brand'] = df['Brand'].str.lower()
 
-        brand_data = df['Brand'].unique()
+        df = df.loc[~(df['Brand']=="Tidak Ada Merek")]
+
         #Create new columns using official_brand_recognizer from FeatureGenerator
-        df['Store Type'] = df['Nama Toko'].apply(lambda text:fgen.official_brand_recognizer(brand_list = brand_data,store_name=text)) 
+        df['Store Type'] = df['Nama Toko'].apply(lambda text:fgen.official_brand_recognizer(brand_list = brand_list,store_name=text)) 
         
         #Check the age of product list                                                                                    store_name = str(text)))
         if 'Tanggal Listing' in df.keys():
