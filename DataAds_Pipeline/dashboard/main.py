@@ -27,7 +27,10 @@ df_keyword = GetData(DashboardConfig.DB_KEY,query = QUERY_KEYWORD)
 
 
 #Create Charts
-st.write('Nose Ads Dashboard')
+st.title('Nose Ads Dashboard')
+
+st.set_page_config(layout="wide")
+
 if "counter" not in st.session_state:
     st.session_state.counter = 0
 st.session_state.counter += 1
