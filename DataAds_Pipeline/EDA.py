@@ -81,11 +81,6 @@ def MarketFunnelPlot(df:pd.DataFrame,stages:list):
                     y = stages ,
                     name = row['Month'],
                     textinfo = 'value+percent initial'))
-    fig.update_layout(
-            width = 1900,
-            height = 800,
-            plot_bgcolor = 'white'
-            )
     return fig
 
 
