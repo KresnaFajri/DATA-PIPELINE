@@ -1,0 +1,196 @@
+/* ── Metric grid layout ── */
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* ── Card base ── */
+.metric-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 0.5px solid rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition:
+        border-color 0.35s ease,
+        background   0.35s ease,
+        transform    0.30s ease;
+}
+
+/* Bottom glow on hover */
+.metric-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: radial-gradient(ellipse at 50% 120%, rgba(124, 58, 237, 0.28) 0%, transparent 65%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+/* Top-left corner bracket */
+.metric-card::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 12px;
+    height: 12px;
+    border-top: 1.5px solid #a855f7;
+    border-left: 1.5px solid #a855f7;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.metric-card:hover {
+    border-color: rgba(168, 85, 247, 0.75);
+    background: rgba(124, 58, 237, 0.10);
+    transform: translateY(-5px);
+}
+
+.metric-card:hover::before { opacity: 1; }
+.metric-card:hover::after  { opacity: 1; }
+
+/* ── Scan line animation ── */
+.scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.8), transparent);
+    top: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.metric-card:hover .scan-line {
+    animation: scan 0.7s ease-out forwards;
+}
+
+@keyframes scan {
+    0%   { top: 0%;   opacity: 0.9; }
+    100% { top: 100%; opacity: 0;   }
+}
+
+/* ── Label ── */
+.metric-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2.2px;
+    color: #6e6a85;
+    margin-bottom: 12px;
+    transition: color 0.3s, letter-spacing 0.3s;
+}
+
+.metric-card:hover .metric-label {
+    color: #c084fc;
+    letter-spacing: 2.8px;
+}
+
+/* ── Value ── */
+.metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 34px;
+    font-weight: 300;
+    color: #e2e0f0;
+    line-height: 1;
+    margin-bottom: 10px;
+    transition: font-size 0.30s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.3s;
+}
+
+.metric-card:hover .metric-value       { font-size: 46px; color: #e879f9; }
+
+.metric-value.teal                     { color: #22d3ee; }
+.metric-card:hover .metric-value.teal  { color: #67e8f9; }
+
+.metric-value.green                    { color: #34d399; }
+.metric-card:hover .metric-value.green { color: #6ee7b7; }
+
+.metric-value.amber                    { color: #fbbf24; }
+.metric-card:hover .metric-value.amber { color: #fde68a; }
+
+.metric-value.red                      { color: #f87171; }
+.metric-card:hover .metric-value.red   { color: #fca5a5; }
+
+/* ── Delta / sub-label ── */
+.metric-delta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #3d3a52;
+    opacity: 0.7;
+    transition: color 0.3s, opacity 0.3s;
+}
+.metric-delta:empty {
+    display:none;
+}
+.metric-delta.green { color: #34d399; }
+.metric-card:hover .metric-delta.green { color: #6ee7b7; }
+.metric-card:hover .metric-delta      { color: #a78bfa; opacity: 1; }
+.metric-delta.warn                    { color: #78350f; }
+.metric-card:hover .metric-delta.warn { color: #fbbf24; }
+.metric-delta.danger                  { color: #7f1d1d; }
+.metric-card:hover .metric-delta.danger { color: #f87171; }
+
+/* ── Status panel (node list) ── */
+.status-panel {
+    background: rgba(255, 255, 255, 0.03);
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 20px 22px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.status-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    color: #6e6a85;
+    margin-bottom: 16px;
+}
+
+.status-table { width: 100%; border-collapse: collapse; }
+
+.status-row td {
+    padding: 9px 0;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.05);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.status-row:last-child td { border-bottom: none; }
+
+.dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.dot-online  { background: #34d399; box-shadow: 0 0 6px #34d399; }
+.dot-idle    { background: #fbbf24; box-shadow: 0 0 6px #fbbf24; }
+.dot-offline { background: #3d3a52; }
+
+.node-name { color: #b8b5cc; }
+
+.status-tag {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    float: right;
+}
+
+.tag-online  { color: #34d399; background: rgba( 52, 211, 153, 0.12); }
+.tag-idle    { color: #fbbf24; background: rgba(251, 191,  36, 0.12); }
+.tag-offline { color: #3d3a52; background: rgba( 60,  58,  80, 0.20); }
