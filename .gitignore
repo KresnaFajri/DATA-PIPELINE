@@ -1,5 +1,9 @@
 # ignore all .env files in any folder
 .env
 *.env
+.streamlit/secrets.toml
+*.duckdb
+__pycache__/
+*.pyc
 /DATA_COSMETICS_BRAND.csv
 /pipeline.py
