@@ -1,7 +1,7 @@
 import streamlit as st
 import sys
 import duckdb
-sys.path.append("C:\KRESNA\Tools-20251201T015117Z-1-001\Tools\DATA PIPELINE\DataAds_Pipeline")
+sys.path.append(r"C:\KRESNA\Tools-20251201T015117Z-1-001\Tools\DATA PIPELINE\DataAds_Pipeline")
 from EDA import *
 from config import DashboardConfig
 from pathlib import Path
