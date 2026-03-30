@@ -1,4 +1,5 @@
 # ignore all .env files in any folder
-#.env
+.env
+*.env
 /DATA_COSMETICS_BRAND.csv
 /pipeline.py
