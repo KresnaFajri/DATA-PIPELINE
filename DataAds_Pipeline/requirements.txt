@@ -4,4 +4,4 @@ plotly
 python-dotenv
 python_dateutil
 streamlit
-altair
+altair.vegalite.v4
