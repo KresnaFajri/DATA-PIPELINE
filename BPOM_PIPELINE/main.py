@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from load import load_data,upload_temp_table,update_main_table
 from transform import skincare_categorizer_function
-from psycopg2.extras import execute_batch
+
 from config import Config
 
 def connect_db():

@@ -6,7 +6,7 @@ from pathlib import Path
 from config import Config
 import sys
 sys.path.append(r"C:\KRESNA\Tools-20251201T015117Z-1-001\Tools")
-from DataCleaner import DataCleaner
+from DataCleaner import DataCleaner,FeatureGenerator
 import warnings
 from extract import ExtractFiles
 from transform import TransformFiles
@@ -15,6 +15,8 @@ from load import LoadDuckDB
 warnings.filterwarnings("ignore", category=UserWarning, module='openpyxl')
 
 cleaner = DataCleaner()
+AdsAnalyzer = FeatureGenerator().AdsAnalyzer()
+
 SOURCEFILES = [d for d in os.listdir(Config.SOURCE_PATH) if os.path.isdir(os.path.join(Config.SOURCE_PATH, d))]
 print("Folders:", SOURCEFILES)
 
@@ -34,6 +36,7 @@ for dir in SOURCEFILES:
                 print(f'Files Exist : {AGE_DATAPATH}')
                 df = ExtractFiles(AGE_DATAPATH)
                 df['Month'] = month
+                df["Month"] = pd.to_datetime(df["Month"])
                 recap_df,main_df = cleaner.SplitRecapRows(df)
                 age_df.append(main_df)
             else:
@@ -45,6 +48,7 @@ for dir in SOURCEFILES:
                 print(f'Keywords File Exists : {KEYWORD_DATAPATH}')
                 df = ExtractFiles(KEYWORD_DATAPATH)
                 df['Month'] = month
+                df["Month"] = pd.to_datetime(df["Month"])
                 recap_df,main_df = cleaner.SplitRecapRows(df)
                 keyword_df.append(main_df)
             else:
@@ -55,7 +59,10 @@ for dir in SOURCEFILES:
             if os.path.exists(CAMPAIGN_DATAPATH):
                 print(f'Campaign file exists : {CAMPAIGN_DATAPATH}')
                 df = ExtractFiles(CAMPAIGN_DATAPATH)
+                metric_dict = df['Results'].apply(lambda text: AdsAnalyzer.parse_info(text,delimiter=','))
+                df = pd.concat([df,pd.DataFrame(metric_dict.tolist())], axis=1)
                 df['Month'] = month
+                df["Month"] = pd.to_datetime(df["Month"])
                 recap_df, main_df = cleaner.SplitRecapRows(df)
                 campaign_df.append(main_df)
             else:
@@ -67,10 +74,12 @@ for dir in SOURCEFILES:
                 print(f'Location file exits: {LOCATION_DATAPATH}')
                 df = ExtractFiles(LOCATION_DATAPATH)
                 df['Month'] = month
+                df["Month"] = pd.to_datetime(df["Month"])
                 recap_df,main_df = cleaner.SplitRecapRows(df)
                 location_df.append(main_df)
             else:
                 print(f'Location file can not be found')
+
 
 TARGET_FILES = os.listdir(Config.TARGET_PATH)
 #Transform data,eliminate all 0 and NULL columns, and automatically set all data into DuckDB
@@ -78,6 +87,7 @@ if campaign_df:
     campaign_df = pd.concat(campaign_df, ignore_index = True)
     campaign_df.to_excel(os.path.join(Config.TARGET_PATH,'campaign_raw.xlsx'))
     campaign_df = TransformFiles(campaign_df,suffix='campaign')
+    print(campaign_df.columns)
     LoadDuckDB(
         df = campaign_df,
         db_path = os.path.join(Config.TARGET_PATH,'campaign.duckdb'),
@@ -113,3 +123,4 @@ if age_df:
         db_path = os.path.join(Config.TARGET_PATH,'age.duckdb'),
         table_name = 'AgeReport',
         mode = 'replace')
+    

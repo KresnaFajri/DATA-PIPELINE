@@ -1,4 +1,5 @@
 from config import DashboardConfig
+import streamlit as st
 
 def QueryConversionPerMonth(db_name,table,date_choice)->str:
     return f"""
@@ -66,4 +67,21 @@ def QueryTopKeywords(period_choice):
     GROUP BY keyword_keyword
     ORDER BY "Total Conversions" DESC
     LIMIT 10
+    """
+def QueryImpressionShare(campaign,period_choice):
+    return f"""
+    SELECT
+    campaign,
+    CAST("search_impr._share_campaign" AS FLOAT) AS "Impression Share",
+    CAST("search_lost_is_(rank)_campaign" AS FLOAT) AS "Lost IS"
+    FROM CampaignReport
+    WHERE month_campaign = '{period_choice}' AND campaign = '{campaign}'
+    ORDER BY "Impression Share" DESC 
+    """
+def GetCampaignList(period_choice):
+    return f"""
+    SELECT 
+    DISTINCT campaign
+    FROM CampaignReport
+    WHERE month_campaign = '{period_choice}'
     """

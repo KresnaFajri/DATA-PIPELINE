@@ -40,6 +40,28 @@ PYCHARM_FUNNEL_COLORS = [
 # Palet warna aurora
 AURORA_COLORS = ["#a855f7", "#22d3ee", "#e879f9", "#34d399", "#fbbf24"]
 
+# ── Plotly theme yang sesuai dengan aurora background ────────────────────────
+PLOTLY_THEME = dict(
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+    font=dict(family="JetBrains Mono", color="#b8b5cc", size=11),
+    xaxis=dict(
+        gridcolor="rgba(255,255,255,0.05)",
+        linecolor="rgba(255,255,255,0.08)",
+        tickcolor="rgba(255,255,255,0.08)",
+    ),
+    yaxis=dict(
+        gridcolor="rgba(255,255,255,0.05)",
+        linecolor="rgba(255,255,255,0.08)",
+        tickcolor="rgba(255,255,255,0.08)",
+    ),
+    margin=dict(l=0, r=0, t=24, b=0),
+)
+
+PLOTLY_CONFIG = dict(
+    displayModeBar=False,
+)
+
 def glass_section(title: str, content_fn, *args, **kwargs) -> None:
     """
     Wrapper glass panel dengan section header.
@@ -77,9 +99,9 @@ def render_line_chart(x: list, y: list, label: str = "Value") -> None:
         fill="tozeroy",
         fillcolor="rgba(124,58,237,0.10)",
     ))
+
     fig.update_layout(**AURORA_TEMPLATE)
     st.plotly_chart(fig, use_container_width=True)
-
 
 def render_bar_chart(categories: list, values: list, label: str = "Value") -> None:
     """
@@ -101,6 +123,7 @@ def render_bar_chart(categories: list, values: list, label: str = "Value") -> No
             line=dict(color="#a855f7", width=1),
         ),
     ))
+
     fig.update_layout(**AURORA_TEMPLATE)
     st.plotly_chart(fig, use_container_width=True)
 
@@ -129,7 +152,6 @@ def render_invertedbar_chart(categories: list, values: list, label: str = "Value
     fig.update_layout(yaxis=dict(categoryorder='total ascending'))
     st.plotly_chart(fig, use_container_width=True)
 
-
 def render_donut_chart(labels: list, values: list, title: str = "") -> None:
     """
     Donut / pie chart dengan styling aurora.
@@ -154,6 +176,7 @@ def render_donut_chart(labels: list, values: list, title: str = "") -> None:
             annotations=[dict(text=title, x=0.5, y=0.5, font_size=12,
                               font_color="#e2e0f0", showarrow=False)]
         )
+
     fig.update_layout(**AURORA_TEMPLATE)
     fig.update_layout(showlegend=True,
                       legend=dict(font=dict(color="#b8b5cc", size=10)))
@@ -223,4 +246,3 @@ def MarketFunnelPlot(df: pd.DataFrame, stages: list):
         **AURORA_TEMPLATE,  # pakai template aurora yang sudah dibuat
         height=420)    
     st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-

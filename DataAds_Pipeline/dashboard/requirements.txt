@@ -1,0 +1,6 @@
+duckdb==1.5.1
+pandas==3.0.1
+plotly==6.5.0
+python-dotenv==1.2.2
+python_dateutil==2.9.0.post0
+streamlit==1.55.0

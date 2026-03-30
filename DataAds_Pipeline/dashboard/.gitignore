@@ -1,0 +1,11 @@
+#Env files
+.env
+
+__pycache__/
+*.pyc
+
+.vscode/
+.DS_Store
+
+.streamlit
+.secrets.toml

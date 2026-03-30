@@ -3,6 +3,7 @@ import sys
 import re
 from rapidfuzz import fuzz
 import ahocorasick
+from flashtext import KeywordProcessor
 
 def CleaningPunct(df,columns):
     df = df.copy()
@@ -88,3 +89,22 @@ def extract_brand(text, automaton,brand_list,fuzzy_threshold=80):
 
     best_match = max(matches, key=lambda x:(x[1],len(x[0])))
     return best_match[0]
+    
+def CheckIngredients(text:str,ingredients_list:list,fuzzy_threshold=95):
+    """
+    Modul untuk cek data ingredients/bahan aktif skincare/CPOTB
+    Params:
+    - text(str) : Nama teks yang ingin dicari keberadaan ingredientsnya
+    - ingredients_list(list):List data ingredients sebagai referensi
+    - fuzzy_threshold : Parameter kemiripan string yang ditemukan di teks dgn ingredients list
+    """
+    # --Inisiasi KeywordProcessor dari FlashText
+    kp = KeywordProcessor()
+    text = text.lower()
+    
+    for ingredients in ingredients_list:
+        ingredients = ingredients.strip().lower()
+        kp.add_keywords(data)
+        
+    result = kp.extract_keywords(text)
+    return result

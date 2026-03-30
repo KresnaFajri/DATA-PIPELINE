@@ -5,20 +5,20 @@ import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
 
-def GetData(db_path:Path,query:str):
+@st.cache_resource
+def GetConnection(database_name,ACCESS_TOKEN):
+    conn = duckdb.connect(f"md:?motherduck_token={ACCESS_TOKEN}")
+    conn.execute(f"ATTACH IF NOT EXISTS 'md:{database_name}' as {database_name}")
+    return conn
 
-    conn = duckdb.connect(db_path)
-
+def GetData(query:str,ACCESS_TOKEN=None,USE_MOTHERDUCK = False,db_name = None,db_path=None):
+    if USE_MOTHERDUCK:
+         #Streamlit cloud  -> MotherDuck
+         conn = GetConnection(database_name = db_name,ACCESS_TOKEN = ACCESS_TOKEN)
+    else:
+        conn = duckdb.connect(db_path)
     df = conn.execute(query).fetchdf()
     return df
-
-def GetDataForMetrics(db_path:Path,query:str):
-
-    conn = duckdb.connect(db_path)
-
-    metrics = conn.execute(query).fetchdf()
-
-    return metrics
 
 def DataGroupingConversions(db_name:str,df:pd.DataFrame,categories:list):
 

@@ -1,24 +1,29 @@
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+import streamlit as st
 
-BASE_DIR = Path(__file__).resolve().parent
-load_dotenv(BASE_DIR/".env")
+#BASE_DIR = Path(__file__).resolve().parent
+#load_dotenv(BASE_DIR/".streamlit/secrets.toml")
 
 class DashboardConfig:
     
-    DB_AGE_PATH = os.getenv("DB_AGE")
-    DB_LOC_PATH = os.getenv("DB_LOC")
-    DB_CAM_PATH = os.getenv("DB_CAM")
-    DB_KEY_PATH = os.getenv("DB_KEY")
+    DB_AGE_PATH = st.secrets.get("DB_AGE") 
+    DB_LOC_PATH = st.secrets.get("DB_LOC") 
+    DB_CAM_PATH = st.secrets.get("DB_CAM") 
+    DB_KEY_PATH = st.secrets.get("DB_KEY")
 
-    db_loc = os.getenv("db_loc")
-    db_campaign = os.getenv("db_camp")
-    db_keyword = os.getenv("db_keyword")
-    db_age = os.getenv("db_age")
+    db_loc = st.secrets.get("db_loc") 
+    db_campaign = st.secrets.get("db_camp")
+    db_keyword = st.secrets.get("db_keyword")
+    db_age = st.secrets.get("db_age") 
 
-    LOC_TABLE = os.getenv("LOC_TABLE")
-    KEY_TABLE = os.getenv("KEY_TABLE")
-    CAMP_TABLE = os.getenv("CAMP_TABLE")
-    AGE_TABLE = os.getenv("AGE_TABLE")
+    LOC_TABLE = st.secrets.get("LOC_TABLE")
+    KEY_TABLE = st.secrets.get("KEY_TABLE")
+    CAMP_TABLE = st.secrets.get("CAMP_TABLE")
+    AGE_TABLE = st.secrets.get("AGE_TABLE")
+
+    USE_MOTHERDUCK = st.secrets.get("USE_MOTHERDUCK")
+    ACCESS_TOKEN = st.secrets.get("ACCESS_TOKEN")
+
 
