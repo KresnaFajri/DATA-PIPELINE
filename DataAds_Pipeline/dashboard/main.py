@@ -61,8 +61,7 @@ PERIOD_LIST = GetPeriod()
 
 if "CHOICE" not in st.session_state:
     st.session_state.CHOICE = PERIOD_LIST["month_campaign"].tolist()[0]
-if "selected_campaign"not in st.session_state:
-    st.session_state.selected_campaign = None
+
 
 MONTH_NAME= ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
 CHOICE = st.selectbox(
@@ -220,10 +219,14 @@ def GetImpressionShare(campaign,period_choice):
         query = QueryImpressionShare(campaign=campaign, period_choice = period_choice))
 
 #4th row
+if "selected_campaign"not in st.session_state:
+    st.session_state.selected_campaign = None
+    
 st.header(f"Impression Share per Campaign in {pd.to_datetime(CHOICE,yearfirst=True).strftime('%B, %Y')}")
 selected_campaign = st.selectbox("Pilih Campaign",
                                  CAMPAIGN_LIST['campaign'],
                                  key = "selected_campaign")
+    
 if selected_campaign:
     ImpressionShareData = GetImpressionShare(selected_campaign, CHOICE)
     if not ImpressionShareData.empty:
