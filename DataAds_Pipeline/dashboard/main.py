@@ -1,5 +1,6 @@
 import streamlit as st
 import sys
+import os
 import duckdb
 sys.path.append(r"C:\KRESNA\Tools-20251201T015117Z-1-001\Tools\DATA PIPELINE\DataAds_Pipeline")
 from EDA import *
@@ -28,6 +29,7 @@ def load_css(*paths: str) -> None:
         css += Path(path).read_text()
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
+st.write("Files in styles:", os.listdir(BASE_DIR / "styles"))
 load_css(r"BASE_DIR/styles/background.css", r"/mount/src/data-pipeline/DataAds_Pipeline/dashboard/styles/metrics.css")
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown("""
