@@ -76,7 +76,8 @@ df_filtered = con.execute("""
                            WHERE month_campaign = ?
                            """,[CHOICE.to_pydatetime()]).df()
 
-CAMPAIGN_LIST = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+CAMPAIGN_LIST = GetData(db_name = "campaign",
+                        USE_MOTHERDUCK=DashboardConfig.USE_MOTHERDUCK,
                         ACCESS_TOKEN =DashboardConfig.ACCESS_TOKEN,
                         query = GetCampaignList(period_choice=CHOICE))
 
@@ -86,42 +87,42 @@ def CalculateDelta(current,before):
      delta_text = f"+{delta:,.0f}" if delta >= 0 else f"{delta:,.0f}"
      return delta_class, delta_text
 
-ConvCurrent = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ConvCurrent = GetData(db_name = "campaign",
                       USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                      #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                      ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                     query = QueryConversionPerMonth(db_name = "campaign",table = DashboardConfig.CAMP_TABLE,
                                                                     date_choice = CHOICE)).iloc[0,0]
 
-ConvBefore = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ConvBefore = GetData(db_name = "campaign",
                                 USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                                #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                                ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                                 query = QueryConversionPerMonth(db_name = "campaign",table = DashboardConfig.CAMP_TABLE,
                                                                     date_choice = CHOICE-relativedelta(months=1))).iloc[0,0]
 
-ClicksCurrent = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ClicksCurrent = GetData(db_name = "campaign",
                         USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                        #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                        ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                         query = QueryClickPerMonth(db_name = "campaign",table = DashboardConfig.CAMP_TABLE,
                                                         date_choice=CHOICE)).iloc[0,0]
-ClicksBefore = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ClicksBefore = GetData(db_name = "campaign",
                        USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                       #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                       ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                        query=QueryClickPerMonth(db_name = "campaign",
                                                 table = DashboardConfig.CAMP_TABLE,
                                                 date_choice=CHOICE-relativedelta(months=1))).iloc[0,0]
-ClicksCurrent = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ClicksCurrent = GetData(db_name = "campaign",
                         USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                        #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                        ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                         query = QueryClickPerMonth(db_name = "campaign",table = DashboardConfig.CAMP_TABLE,
                                                         date_choice=CHOICE)).iloc[0,0]
-ClicksBefore = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ClicksBefore = GetData(db_name = "campaign",
                        USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                       #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                       ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                        query=QueryClickPerMonth(db_name = "campaign",table = DashboardConfig.CAMP_TABLE,
                                                              date_choice=CHOICE-relativedelta(months=1))).iloc[0,0]
-ActiveCampaignCount = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+ActiveCampaignCount = GetData(db_name = "campaign",
                               USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
-                              #ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
+                              ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                               query=CountRunningCampaign(db_name = "campaign",table = DashboardConfig.CAMP_TABLE,
                                                       date_choice=CHOICE)).iloc[0,0]
 
@@ -157,7 +158,9 @@ render_metrics(metrics_data)
 # Charts
 # ══════════════════════════════════════════════════════════════════════════════
 # 1. Grafik 1 : Whole Conversion Chart 2024-2026
-ConversionTimeline = GetData(db_path=DashboardConfig.DB_CAM_PATH,
+ConversionTimeline = GetData(db_name="campaign",
+                             USE_MOTHERDUCK=DashboardConfig.USE_MOTHERDUCK,
+                             ACCESS_TOKEN = DashboardConfig.ACCESS_TOKEN,
                                  query=QueryConversionData(db_name = "campaign",table="CampaignReport"))
 
 st.header("Total Konversi Visitor Menjadi Potential Client Sepanjang Tahun")
@@ -167,15 +170,21 @@ render_line_chart(x = ConversionTimeline['month_campaign'],
 col1,col2 = st.columns(2)
 
 # 2.Percentage of Effective Campaign in gaining customer
-CampaignConversionData = GetData(db_path = DashboardConfig.DB_CAM_PATH,
+CampaignConversionData = GetData(db_name = "campaign",
+                                 USE_MOTHERDUCK = DashboardConfig.USE_MOTHERDUCK,
+                                 ACCESS_TOKEN = DashboardConfig.ACCESS_TOKEN,
                                  query=QueryCampaignConv(db_name = "campaign",table="CampaignReport",
                                                    period_choice=CHOICE))
 
-CampaignBudgetData = GetData(db_path=DashboardConfig.DB_CAM_PATH,
+CampaignBudgetData = GetData(db_name="campaign",
+                             USE_MOTHERDUCK=DashboardConfig.USE_MOTHERDUCK,
+                             ACCESS_TOKEN = DashboardConfig.ACCESS_TOKEN,
                             query=QueryCostCampaign(db_name = "campaign",table="CampaignReport",
                                                    period_choice=CHOICE))
 
-FunnelDF = GetData(db_path=DashboardConfig.DB_CAM_PATH,
+FunnelDF = GetData(db_name="campaign",
+                   USE_MOTHERDUCK=DashboardConfig.USE_MOTHERDUCK,
+                   ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                              query=FunnelStaging(period_choice=CHOICE))
 funneling_stage = FunnelDF.columns.tolist()
 
@@ -194,7 +203,9 @@ with col3:
     st.header(f"Marketing Funnel in {pd.to_datetime(CHOICE,yearfirst=True).strftime('%B, %Y')}")
     MarketFunnelPlot(df = FunnelDF,stages = funneling_stage)
 
-TopKeywords = GetData(db_path=DashboardConfig.DB_KEY_PATH,
+TopKeywords = GetData(db_name="keyword",
+                      USE_MOTHERDUCK=DashboardConfig.USE_MOTHERDUCK,
+                      ACCESS_TOKEN=DashboardConfig.ACCESS_TOKEN,
                       query=QueryTopKeywords(period_choice=CHOICE))
 with col4:
     st.header(f"Top Keywords in {pd.to_datetime(CHOICE,yearfirst=True).strftime('%B, %Y')}")
@@ -203,7 +214,8 @@ with col4:
 @st.cache_data(ttl=60)
 def GetImpressionShare(campaign,period_choice):
     return GetData(
-        db_path = DashboardConfig.DB_CAM_PATH,
+        db_name = "campaign",
+        USE_MOTHERDUCK=DashboardConfig.USE_MOTHERDUCK,
         ACCESS_TOKEN = DashboardConfig.ACCESS_TOKEN,
         query = QueryImpressionShare(campaign=campaign, period_choice = period_choice))
 
