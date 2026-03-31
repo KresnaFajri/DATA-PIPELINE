@@ -62,7 +62,7 @@ def QueryTopKeywords(period_choice):
     SELECT 
     keyword_keyword AS "Keywords",
     SUM(conversions_keyword) AS "Total Conversions"
-    FROM KeywordReport
+    FROM keyword.KeywordReport
     WHERE month_keyword = '{period_choice}'
     GROUP BY keyword_keyword
     ORDER BY "Total Conversions" DESC
