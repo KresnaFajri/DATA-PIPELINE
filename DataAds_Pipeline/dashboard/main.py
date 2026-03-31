@@ -28,7 +28,7 @@ def load_css(*paths: str) -> None:
         css += Path(path).read_text()
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
-load_css(r"BASE_DIR / "styles" / "background.css"", r"/mount/src/data-pipeline/DataAds_Pipeline/dashboard/styles/metrics.css")
+load_css(r"BASE_DIR/styles/background.css", r"/mount/src/data-pipeline/DataAds_Pipeline/dashboard/styles/metrics.css")
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="jb-title">Dashboard Ads</div>
