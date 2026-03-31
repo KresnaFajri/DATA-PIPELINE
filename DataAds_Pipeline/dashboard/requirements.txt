@@ -1,6 +1,7 @@
 duckdb
+altair
+streamlit
 pandas
 plotly
 python-dotenv
 python_dateutil
-streamlit
