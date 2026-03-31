@@ -18,6 +18,11 @@ st.set_page_config(
 )
 
 # ── Helper: load CSS dari file ────────────────────────────────────────────────
+BASE_DIR = Path(__file__).resolve().parent
+
+st.write("BASE_DIR:", BASE_DIR)
+st.write("CSS path:", BASE_DIR / "styles" / "background.css")
+
 def load_css(*paths: str) -> None:
     css = ""
     for path in paths:
