@@ -24,7 +24,7 @@ def load_css(*paths: str) -> None:
         css += Path(path).read_text()
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
-load_css(r"styles\background.css", r"styles\metrics.css")
+load_css(r"styles/background.css", r"styles/metrics.css")
 # ── Header ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="jb-title">Dashboard Ads</div>
