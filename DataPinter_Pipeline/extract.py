@@ -1,12 +1,11 @@
 import pandas as pd
 from pathlib import Path
 import sys
-sys.path.append(r"C:\KRESNA\Tools-20251201T015117Z-1-001\Tools")
+sys.path.append(r"/home/user2/airflow")
 from DataCleaner import DataCleaner
 
-cleaner = DataCleaner()
-
 def extract_files(input_path) -> pd.DataFrame:
+    cleaner = DataCleaner()
     if input_path.endswith(".csv"):
         df = pd.read_csv(input_path,usecols =['Omset 30 Hari'])
         result = cleaner.DetectNumericDelimiter(df['Omset 30 Hari'])
@@ -20,4 +19,3 @@ def extract_files(input_path) -> pd.DataFrame:
         return df
     else:
         raise ValueError(f"Unsupported input_path type")
-    

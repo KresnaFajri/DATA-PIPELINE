@@ -1,14 +1,32 @@
 import duckdb
 import pandas as pd
+import psycopg2
+from config import AutomatePipelineConfig
+
+
+SKINCARE_CATEGORIES = {'toner','serum','cleanser','face wash','sunscreen','moisturizer','men care','parfum','perfume'}
+BODYCARE_CATEGORIES = {'body wash','body lotion','body mask','body_wash','body_lotion','body_mask'}
+HAIRCARE_CATEGORIES = {'hair','rambut','conditioner','shampoo','hair mask','hair serum'}
+LIPCARE_CATEGORIES = {'lip serum','lip cream',"lip balm"}
+DECORATIVE_CATEGORIES= {'lip tint','lip matte','lip vinyl','lip stick','cushion','foundation'}
+SUPLEMEN_CATEGORIES = {'suplemen', 'kapsul','vitamin','creatine','fitness','gym','whey protein','eye cream'}
+
+def ConnectToPostgres():
+    conn = psycopg2.connect(
+        dbname = AutomatePipelineConfig.POSTGRES_DBNAME,
+        user = AutomatePipelineConfig.POSTGRES_USER,
+        host = AutomatePipelineConfig.POSTGRES_HOST,
+        password = AutomatePipelineConfig.POSTGRES_PASSWORD,
+        port = AutomatePipelineConfig.POSTGRES_PORT)
+    return conn
 
 def CreateDB(con, table_name):
     con.execute(f"""
         CREATE TABLE IF NOT EXISTS "{table_name}" (
             nama_produk VARCHAR,
+            name_produk_pendek VARCHAR,
             brand VARCHAR,
             nama_toko VARCHAR,
-            lokasi VARCHAR,
-            tren VARCHAR,
             umur_listing INTEGER,
             harga_asli DOUBLE,
             harga DOUBLE,
@@ -26,7 +44,7 @@ def CreateDB(con, table_name):
             price_distributions VARCHAR,
             store_type VARCHAR,
             ecommerce_platform VARCHAR,
-            query_keywords VARCHAR
+            query_keywords VARCHAR,
         )
     """)
 
@@ -38,21 +56,22 @@ def InsertLog(DB_LOG, file_name, file_path, status):
             status)
             VALUES (?,?,?)""",
             [file_name, file_path,status])
+    con.close()
 
 def LoadDuckDB(df, db_path, table_name,
                DB_LOG,file_name,file_path,status='FAILED'):
     try:
         table_name = table_name.lower()
         con = duckdb.connect(db_path)
-
         CreateDB(con,table_name)
-        
+
         df.columns = [c.lower() for c in df.columns]
+        print(f"Columns in DataFrame: {df.columns.tolist()}")
+
         con.register("df_view", df)
 
         # Check table existence
         table_exists = con.execute(f""" SELECT COUNT(*) FROM information_schema.tables WHERE lower(table_name) = '{table_name}' """).fetchone()[0] > 0
-
         # If table not exists → create and stop if not table_exists:
         if not table_exists:
             con.execute(f""" CREATE TABLE "{table_name}" AS SELECT * FROM df_view """)
@@ -61,12 +80,11 @@ def LoadDuckDB(df, db_path, table_name,
         
         # Delete existing records (idempotent behavior)
         con.execute(f""" DELETE FROM "{table_name}" USING df_view WHERE "{table_name}".url = df_view.url AND "{table_name}".query_date = df_view.query_date """)
-
         # Insert fresh data
         con.execute(f""" INSERT INTO "{table_name}" SELECT * FROM df_view """)
         InsertLog(DB_LOG,file_name, file_path,status="SUCCESS")
+        
     except Exception as e:
-
         #lOG FAIL
         InsertLog(DB_LOG, file_name, file_path,status="FAILED")
         raise e
@@ -91,4 +109,15 @@ def ReadLog(DB_LOG, file_name):
         """,[file_name]).fetchone()[0]
     
     return result > 0 
-    
+
+def CreateLog(DB_LOG):
+    con = duckdb.connect(DB_LOG)
+    con.execute("""
+        CREATE SEQUENCE IF NOT EXISTS pipeline_log_id_seq START 1;""")
+    con.execute("""CREATE TABLE IF NOT EXISTS pipeline_log (
+            id INTEGER PRIMARY KEY DEFAULT NEXTVAL('pipeline_log_id_seq'),
+            file_name VARCHAR,
+            file_path VARCHAR,
+            status VARCHAR,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+            """)
